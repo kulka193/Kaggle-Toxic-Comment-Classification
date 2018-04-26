@@ -120,38 +120,48 @@ def encode_words(vocab_size,X):
     return encoded
 
 
-global project_path    
-project_path=SearchAndAppendPath('Toxic Comment Challenge')
-zipfilepath=getfile_maybeDownload('train')
-extract_zip(zipfilepath)
-print("=====file extracted=====")
-#Xtrain,ytrain=read_file('\\train.csv')
+def savemodel(model):
+    model_json = model.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("model.h5")
+    print('=====model has been saved in JSON format======')
+    print('=====model has been saved in  format======')
 
-Xtrain,ytrain=read_and_preprocess('\\train.csv')
-num_examples=len(Xtrain)
-num_classes=ytrain.shape[1]
+if __name__=="__main__":
+    global project_path    
+    project_path=SearchAndAppendPath('Toxic Comment Challenge')
+    zipfilepath=getfile_maybeDownload('train')
+    extract_zip(zipfilepath)
+    print("=====file extracted=====")
+    #Xtrain,ytrain=read_file('\\train.csv')
 
-STOPWORDS=set(stopwords.words("english"))
-Xtrain1=remove_stops(Xtrain)
-vocabulary=getvocab(Xtrain1)
-vocabulary_size=len(vocabulary)    #
-processed=encode_words(topwords,Xtrain)
-Xtrain_ready=sequence.pad_sequences(processed,maxlen=maxlen,padding='post')
-print("=====preprocessing done, Ready to go======")
-print('========building the model===========')
+    Xtrain,ytrain=read_and_preprocess('\\train.csv')
+    num_examples=len(Xtrain)
+    num_classes=ytrain.shape[1]
 
-model=Sequential()
-model.add(Embedding(vocabulary_size, 10, input_length=maxlen))
-model.add(LSTM(512,dropout=0.2,recurrent_dropout=0.2))
-model.add(Dense(256,activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(num_classes,activation='softmax'))
-model.summary()
+    STOPWORDS=set(stopwords.words("english"))
+    Xtrain1=remove_stops(Xtrain)
+    vocabulary=getvocab(Xtrain1)
+    vocabulary_size=len(vocabulary)    #
+    processed=encode_words(topwords,Xtrain)
+    Xtrain_ready=sequence.pad_sequences(processed,maxlen=maxlen,padding='post')
+    print("=====preprocessing done, Ready to go======")
+    print('========building the model===========')
 
-model.compile(optimizer='adam',
+    model=Sequential()
+    model.add(Embedding(vocabulary_size, 10, input_length=maxlen))
+    model.add(LSTM(512,dropout=0.2,recurrent_dropout=0.2))
+    model.add(Dense(256,activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(num_classes,activation='softmax'))
+    model.summary()
+
+    model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
-
-model.fit(Xtrain_ready,ytrain,
-          batch_size=batch_size,
-          epochs=epochs)
+    model.fit(Xtrain_ready,ytrain,
+              batch_size=batch_size,
+            epochs=epochs)
+    
