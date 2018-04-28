@@ -45,4 +45,4 @@ loaded_model = model_from_json(loaded_model_json)
 loaded_model.load_weights("model.h5")
 
 #loaded_model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
-score = loaded_model.predict(X=Xtest_ready)
+score = loaded_model.predict(Xtest_ready)
